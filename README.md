@@ -11,6 +11,8 @@ To use the script, you need to pass three required arguments:
 - **Compression algorithm** (`-c`)
 - **Output file name** (`-o`)
 
+To print help, pass -h/-help
+
 ### Basic Syntax
 
 ```

@@ -1,13 +1,18 @@
 #!/bin/bash
 
-ERROR_LOG="error.log"
+# Function for enabling output
+function enable_output {
+	exec 1>&3
+}
 
-exec 3>&1
-exec 2>>"$ERROR_LOG" 1>/dev/null
+# Function for disabling output
+function disable_output {
+	exec 1>/dev/null
+}
 
 # Function to show help
 function show_help {
-        exec 1>&3
+        enable_output
 	echo "Usage: $0 [options]"
 	echo ""
 	echo "Options:"
@@ -15,13 +20,12 @@ function show_help {
 	echo "	-c algorithm	Compression algorithm (none, gzip, bzip)"
 	echo "	-o output	Output file name"
 	echo "	-h help		Help message"
-	exec 1>/dev/null
-	exit 0
+	disable_output
 }
 
 # Function for handling errors
 function log_error {
-	echo "$1" >> "$ERROR_LOG"
+	echo "$1" >&2
 }
 
 # Function to perform the backup with compression 
@@ -53,10 +57,10 @@ function make_backup {
 }
 
 function get_password {
-	exec 1>&3
+	enable_output
 	echo "Enter encription password:"
 	read -s Password
-	exec 1>/dev/null
+	disable_output
 }
 
 # Function to encpypt the backup archive
@@ -69,6 +73,10 @@ function encrypt_backup {
 	fi
 	rm "$output" # Remove unencrypted file
 }
+
+exec 3>&1 # Save stdout
+exec 2>>"error.log" # Redirect stderr 
+disable_output
 
 # Parsing command-line arguments
 while getopts "d:c:o:h" opt; do
@@ -84,9 +92,10 @@ while getopts "d:c:o:h" opt; do
 			;;
 		h)
 			show_help
+			exit 0
 			;;
 		\?)
-			log_error "Error: Invalid option"
+			log_error "Error: Invalid option: ${opt}"
 			exit 1
 			;;
 	esac
@@ -116,74 +125,3 @@ case $Compression in
 		encrypt_backup "$Output.tar.bz2"
 		;;
 esac
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
